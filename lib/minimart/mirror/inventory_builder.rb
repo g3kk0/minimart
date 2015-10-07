@@ -13,12 +13,16 @@ module Minimart
       # @return [Minimart::Mirror::LocalStore] the local store manages the inventory directory contents
       attr_reader :local_store
 
+      # @return [Boolean] Determine whether or not to resolve cookbook dependencies.
+      attr_reader :skip_dependencies
+
       # @param [String] inventory_directory The directory to store the inventory.
       # @param [Minimart::Mirror::InventoryConfiguration] inventory_configuration The inventory as defined by a user of Minimart.
-      def initialize(inventory_directory, inventory_configuration)
-        @graph                   = DependencyGraph.new
+      def initialize(inventory_directory, inventory_configuration, skip_dependencies)
+        @graph                   = DependencyGraph.new(skip_dependencies)
         @local_store             = LocalStore.new(inventory_directory)
         @inventory_configuration = inventory_configuration
+        @skip_dependencies       = skip_dependencies
       end
 
       # Build the inventory!
@@ -57,7 +61,7 @@ module Minimart
       # Add any cookbooks defined in the inventory file as a requirement to the graph
       def add_requirements_to_graph
         inventory_requirements.each do |requirement|
-          graph.add_requirement(requirement.requirements)
+          graph.add_requirement(requirement.requirements(skip_dependencies))
         end
       end
 

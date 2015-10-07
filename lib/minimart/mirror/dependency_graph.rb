@@ -10,10 +10,12 @@ module Minimart
 
       attr_reader :graph
       attr_reader :inventory_requirements
+      attr_reader :skip_dependencies
 
-      def initialize
+      def initialize(skip_dependencies)
         @graph = Solve::Graph.new
         @inventory_requirements = []
+        @skip_dependencies = skip_dependencies
       end
 
       # Add an artifact (cookbook), and its dependencies to the graph.
@@ -22,9 +24,11 @@ module Minimart
         return if source_cookbook_added?(cookbook.name, cookbook.version)
 
         graph.artifact(cookbook.name, cookbook.version).tap do |artifact|
-          cookbook.dependencies.each do |dependency|
-            name, requirements = dependency
-            artifact.depends(name, requirements)
+          unless skip_dependencies
+            cookbook.dependencies.each do |dependency|
+              name, requirements = dependency
+              artifact.depends(name, requirements)
+            end
           end
         end
       end

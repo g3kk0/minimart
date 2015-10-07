@@ -51,6 +51,12 @@ YML
     option :inventory_directory,
       default: DEFAULT_INVENTORY_DIRECTORY,
       desc:    'The path to store any cookbooks downloaded by the mirroring tool.'
+
+    option :skip_dependencies,
+      type:    :boolean,
+      default: false,
+      desc:    'Skip cookbook dependency resolution.'
+
     # Mirror cookbooks specified in an inventory file.
     def mirror
       Minimart::Commands::Mirror.new(options).execute!

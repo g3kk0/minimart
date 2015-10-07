@@ -31,10 +31,14 @@ module Minimart
 
       # The requirements to download this cookbook.
       # @return [Hash]
-      def requirements
+      def requirements(skip_dependencies)
         # if this cookbook has it's location specified, we instead return it's
         # dependencies as we don't need to resolve them elsewhere
-        explicit_location? ? cookbook.dependencies : {name => version_requirement}
+        if skip_dependencies
+          explicit_location? ? {} : {name => version_requirement}
+        else
+          explicit_location? ? cookbook.dependencies : {name => version_requirement}
+        end
       end
 
       # Download a cookbook that has it's location explicitly defined (see #explicit_location?)
